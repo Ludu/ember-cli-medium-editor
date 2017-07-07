@@ -1,12 +1,11 @@
 /* jshint node: true */
 'use strict';
-var path = require('path');
-var Funnel = require('broccoli-funnel');
-var MergeTrees = require('broccoli-merge-trees');
 
-function isNotFastboot() {
-  return process.env.EMBER_CLI_FASTBOOT !== 'true';
-}
+const fs = require('fs');
+const path = require('path');
+const Funnel = require('broccoli-funnel');
+const MergeTrees = require('broccoli-merge-trees');
+const fbTransform = require('fastboot-transform');
 
 module.exports = {
   name: 'ember-cli-medium-editor',
@@ -16,10 +15,8 @@ module.exports = {
 
     var options = app.options.mediumEditorOptions || {};
 
-    if (isNotFastboot()) {
-      this.import('vendor/medium-editor/js/medium-editor.min.js');
-      this.import('vendor/shims/medium-editor.js');
-    }
+    this.import('vendor/medium-editor/js/medium-editor.min.js');
+    this.import('vendor/shims/medium-editor.js');
 
     if (!options.excludeBaseStyles) {
       this.import('vendor/medium-editor/css/medium-editor.min.css');
@@ -34,12 +31,16 @@ module.exports = {
 
   treeForVendor(vendorTree) {
     var distPath = path.resolve(require.resolve('medium-editor'), '..', '..');
-    var mediumEditorTree = new Funnel(distPath, {
-      include: ['**/*'],
-      destDir: 'medium-editor'
-    });
 
-    return new MergeTrees([vendorTree, mediumEditorTree]);
+    if (fs.existsSync(distPath)) {
+      var mediumEditorTree = new Funnel(distPath, {
+        include: ['**/*'],
+        destDir: 'medium-editor'
+      });
+      return new MergeTrees([vendorTree, fbTransform(mediumEditorTree)]);
+    } else {
+      return vendorTree;
+    }
   },
 
   // use ember-simple-auth approach 
