@@ -23,6 +23,11 @@
     "url": "https://github.com/lukebrenton/ember-cli-medium-editor"
   },
   "dependencies": {
-    "ember-cli-babel": "^5.1.5"
+    "broccoli-funnel": "^1.1.0",
+    "broccoli-merge-trees": "^2.0.0",
+    "ember-cli-babel": "^5.1.5",
+    "fastboot-transform": "0.1.2",
+    "fs": "0.0.1-security",
+    "medium-editor": "^5.14.4"
   }
 }
